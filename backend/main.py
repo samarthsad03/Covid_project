@@ -7,12 +7,31 @@ local_server=True
 app = Flask(__name__)
 app.secret_key = "samarthsadana"
 
-app.config['SQLAICHEMY_DATABASE_URI'] ='mysql://username:password@localhost/databasename'
+app.config['SQLALCHEMY_DATABASE_URI'] ='mysql://root:@localhost/Covid'
+db=SQLAlchemy(app)
 
-@app.route('/')
-def home():
-    return render_template("index.html") 
-#here 2 dots means to go backwards to backend directory
 
+#creating a module
+class Test(db.Model):
+    id = db.Column(db.Integer,primary_key = True)
+    name = db.column(db.String(50))
+
+
+@app.route("/")
+def home(): 
+   return render_template("base.html") 
+    
+#checking whether database is connected or not
+@app.route("/test")
+def test():
+    try:
+        a = Test.query.all()
+        print(a)
+        return 'my database is connected'
+    except Exception as e:
+        print(e)
+        return f'not connected{e}'
+    
+    
 
 app.run(debug=True)
