@@ -19,7 +19,12 @@ class Test(db.Model):
 
 @app.route("/")
 def home(): 
-   return render_template("base.html") 
+   return render_template("index.html") 
+
+
+@app.route("/usersignup")
+def userSignup():
+    return render_template("usersignup.html")
     
 #checking whether database is connected or not
 @app.route("/test")

@@ -1,0 +1,31 @@
+{% extends 'baselogin.html' %}
+{%block title %} User Signup {% endblock title %} 
+{%block form %} 
+<h2> Sign Up </h2>
+<div class="row">
+<div class="col-md-4"></div>
+<div class="col-md-4"></div>
+<div class="col-md-4"></div>
+<form action = ""  method="post">
+   
+    <div class="form-group">
+    <input type = "text" class = "form-control mt-2" 
+    placefolder="Enter the SRF ID"  name = "srf" required>
+    </div>
+     <!-- here mt-2 means margin top 2 -->
+
+    <div class="form-group">
+    <input type = "email" class = "form-control mt-2" 
+    placefolder="Enter the Email Address"  name = "email" required>
+    </div>
+    <div class="form-group">
+        <input type = "date" class = "form-control mt-2" 
+        placefolder="Enter DOB"  name = "DOB" required>
+        </div>
+
+    </form>
+
+</div>
+<form action = ""  method="post">
+   
+{% endblock form %} 
