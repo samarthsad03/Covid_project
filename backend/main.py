@@ -16,7 +16,7 @@ class Test(db.Model):
     id = db.Column(db.Integer,primary_key = True)
     name = db.column(db.String(50))
 
-
+# Adding route
 @app.route("/")
 def home(): 
    return render_template("index.html") 
@@ -25,6 +25,10 @@ def home():
 @app.route("/usersignup")
 def userSignup():
     return render_template("usersignup.html")
+
+@app.route("/userlogin")
+def userlogin():
+    return render_template("userlogin.html")
     
 #checking whether database is connected or not
 @app.route("/test")
