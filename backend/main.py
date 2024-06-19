@@ -21,11 +21,8 @@ login_manager.login_view='login'
 app.config['SQLALCHEMY_DATABASE_URI'] ='mysql://root:@localhost/Covid'
 db=SQLAlchemy(app)
 
-#with open('config.json', 'r') as c:
-    #parameters = json.load(c)["parameters"]
-with open('args.config','r') as c:
+with open('config.json', 'r') as c:
     parameters = json.load(c)["parameters"]
-
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -39,6 +36,12 @@ class Test(db.Model):
 
 
 class User(UserMixin, db.Model):
+    hid = db.Column(db.Integer,primary_key=True)
+    hcode = db.Column(db.String(20),unique_key=True)
+    username = db.Column(db.String(100))
+    password = db.Column(db.String(1000))
+
+class hospitaluser(UserMixin, db.Model):
     id = db.Column(db.Integer,primary_key=True)
     srfid = db.Column(db.String(20),unique_key=True)
     email = db.Column(db.String(50))
@@ -103,29 +106,16 @@ def admin():
     if request.method=="POST":
         username = request.form.get('username')
         password= request.form.get('password')
-        if(username == parameters['username'] and password==parameters['password']):
+        if(username == parameters['user'] and password==parameters['password']):
             session['user'] = username
             flash ("login success","info")
-
             return render_template("addhospitaluser.html")
         else:
             flash("login failed","danger")
-        
-
-        
-    return render_template("admin.html")
-        #user = User.query.filter_by(srfid = srfid).first()
-        #filtering email address
-        #if user and check_password_hash(user.dob,dob):
-           # login_user(user)
-           # flash(" Login success" , "info")
-           # return render_template("index.html")
-        #else:
-            #flash("Invalid Credentials","danger") #danger is the colour
-            #return render_template("userlogin.html") #redirect to this template
-    #elif request.method =="GET":
-        #print("[LOGIN]: serving login page")
-        #return render_template("userlogin.html")
+        return render_template("admin.html")
+    elif request.method =="GET":
+        print("[LOGIN]: serving login page")
+        return render_template("userlogin.html")
         
 @app.route('/logout')
 @login_required
@@ -133,6 +123,13 @@ def logout():
     logout_user()
     flash("Logout Successful", "warning")
     return redirect(url_for('login'))
+
+@app.route('/addhospitaluser', methods=['POST', 'GET'])
+def hospitaluser():
+    if('user' in session and session['user']==parameters['user']):
+        if request.method=="POST":
+            pass
+        return render_template("addhospitaluser.html")
 
     
 #checking whether database is connected or not
