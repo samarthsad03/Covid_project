@@ -1,4 +1,4 @@
-from flask import Flask,redirect,render_template,request,flash, url_for
+from flask import Flask, json,redirect,render_template,request,flash, session, url_for
 from flask.globals import request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
@@ -20,6 +20,11 @@ login_manager.login_view='login'
 
 app.config['SQLALCHEMY_DATABASE_URI'] ='mysql://root:@localhost/Covid'
 db=SQLAlchemy(app)
+
+#with open('config.json', 'r') as c:
+    #parameters = json.load(c)["parameters"]
+with open('args.config','r') as c:
+    parameters = json.load(c)["parameters"]
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -59,7 +64,7 @@ def signup():
         emailUser = User.query.filter_by(email=email).first()
         #putting into the database
         if user or emailUser:
-            flash("Email or srfid is already taken", " warning")
+            flash("Email or srfid is already taken", "warning")
             return render_template("usersignup.html")
 
         with db.engine.connect() as conn:
@@ -67,7 +72,7 @@ def signup():
             new_user =  conn.execute(query)
             conn.commit()
         # new_user = db.engine.execute(f"INSERT INTO 'user' ('srfid', 'email', 'dob') VALUES ('{srfid}', '{email}', '{encpassword}') " )
-        user1 = User.query.filter_by(srfid = srfid).first()
+        # user1 = User.query.filter_by(srfid = srfid).first()
         #giving the login access from here
         flash("Signup Success Please Login", "success")
         return render_template("userlogin.html")
@@ -82,21 +87,45 @@ def login():
         print("[LOGIN]: Logging in with- ", srfid, " ", dob)
         user = User.query.filter_by(srfid = srfid).first()
         #filtering email address
-
         if user and check_password_hash(user.dob,dob):
-            print("[LOGIN]: password validated")
-
             login_user(user)
             flash(" Login success" , "info")
             return render_template("index.html")
         else:
-            print("[LOGIN]: password validatedn't")
-
             flash("Invalid Credentials","danger") #danger is the colour
             return render_template("userlogin.html") #redirect to this template
     elif request.method =="GET":
         print("[LOGIN]: serving login page")
         return render_template("userlogin.html")
+    
+@app.route('/admin', methods=['POST', 'GET'])
+def admin():
+    if request.method=="POST":
+        username = request.form.get('username')
+        password= request.form.get('password')
+        if(username == parameters['username'] and password==parameters['password']):
+            session['user'] = username
+            flash ("login success","info")
+
+            return render_template("addhospitaluser.html")
+        else:
+            flash("login failed","danger")
+        
+
+        
+    return render_template("admin.html")
+        #user = User.query.filter_by(srfid = srfid).first()
+        #filtering email address
+        #if user and check_password_hash(user.dob,dob):
+           # login_user(user)
+           # flash(" Login success" , "info")
+           # return render_template("index.html")
+        #else:
+            #flash("Invalid Credentials","danger") #danger is the colour
+            #return render_template("userlogin.html") #redirect to this template
+    #elif request.method =="GET":
+        #print("[LOGIN]: serving login page")
+        #return render_template("userlogin.html")
         
 @app.route('/logout')
 @login_required
