@@ -1,17 +1,19 @@
 {% extends 'baselogin.html' %} {%block title %} User Signup {% endblock title %}
 {%block form %}
 <h2>Sign Up</h2>
+{% include "messages.html" %}
 <div class="row">
   <div class="col-md-4"></div>
   <div class="col-md-4"></div>
   <div class="col-md-4"></div>
-  <form action="" method="post">
+  <form action="/signup" method="post">
+
     <div class="form-group">
       <input
         type="text"
         class="form-control mt-2"
         placeholder="Enter the SRF ID"
-        name="srf"
+        name="srfid"
         required
       />
     </div>
@@ -31,14 +33,14 @@
         type="date"
         class="form-control mt-2"
         placeholder="Enter DOB"
-        name="DOB"
+        name="dob"
         required
       />
     </div>
     <br>
 <button  type ="submit" class="btn btn-info"> SignIn</button>  
 </form>
-<a  class = " text- success" href="/userlogin"> Click here to Login</a>
+<a  class = " text- success" href="/login"> Click here to Login</a>
 </div>
 <form action="" method="post">
     {% endblock form %}

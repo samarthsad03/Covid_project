@@ -5,13 +5,14 @@
   <div class="col-md-4"></div>
   <div class="col-md-4"></div>
   <div class="col-md-4"></div>
-  <form action="" method="post">
+  <form action="/login" method="post">
+  {% include "messages.html" %}
     <div class="form-group">
       <input
         type="text"
         class="form-control mt-2"
         placeholder="Enter the SRF ID"
-        name="srf"
+        name="srfid"
         required
       />
     </div>
@@ -21,14 +22,14 @@
         type="date"
         class="form-control mt-2"
         placeholder="Enter DOB"
-        name="DOB"
+        name="dob"
         required
       />
     </div>
     <br>
 <button  type ="submit" class="btn btn-info">Login</button>  
 </form>
-<a  class = " text-dark" href="/usersignup"> New User? Signup</a>
+<a  class = " text-dark" href="/signup"> New User ? Signup</a>
 </div>
 <form action="" method="post">
     {% endblock form %}

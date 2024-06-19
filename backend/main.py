@@ -1,5 +1,7 @@
-from flask import Flask,redirect,render_template
+from flask import Flask,redirect,render_template,request,flash, url_for
+from flask.globals import request
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import text
 from flask_login import UserMixin
 from flask_login import login_required, login_user,logout_user,login_manager,current_user,LoginManager
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -31,20 +33,14 @@ class Test(db.Model):
     name = db.column(db.String(50))
 
 
-class User(db.Model):
+class User(UserMixin, db.Model):
     id = db.Column(db.Integer,primary_key=True)
-    srfid = db.column(db.String(20),unique_key=True)
-    email = db.Column(db.String(20))
-    dob = db.Column(db.String(20))
+    srfid = db.Column(db.String(20),unique_key=True)
+    email = db.Column(db.String(50))
+    dob = db.Column(db.String(1000))
 
-# Adding route
+# Adding routes
     
-@app.route('/signup',methods = ['POST','GET'])
-def signup ():
-    if request.method=="POST":
-
-
-
 @app.route("/")
 def home(): 
    return render_template("index.html") 
@@ -52,34 +48,62 @@ def home():
 
 
 @app.route('/signup', methods=['POST', 'GET'])
-def signup(request):
+def signup():
+    #taking the input data
     if request.method=="POST":
         srfid = request.form.get('srfid')
         email = request.form.get('email')
         dob = request.form.get('dob')
-        #print(srfid,email,dob)
         encpassword= generate_password_hash(dob) #encrypting password
-        new_user = db.engine.execute(f"INSERT INTO 'user' ('srfid', 'email', 'dob') VALUES ('{srfid}', '{email}', '{encpassword}') " )
-        return ' USER ADDED'
+        user = User.query.filter_by(srfid=srfid).first()
+        emailUser = User.query.filter_by(email=email).first()
+        #putting into the database
+        if user or emailUser:
+            flash("Email or srfid is already taken", " warning")
+            return render_template("usersignup.html")
+
+        with db.engine.connect() as conn:
+            query = text(f"INSERT INTO user (srfid, email, dob) VALUES('{srfid}', '{email}', '{encpassword}')")
+            new_user =  conn.execute(query)
+            conn.commit()
+        # new_user = db.engine.execute(f"INSERT INTO 'user' ('srfid', 'email', 'dob') VALUES ('{srfid}', '{email}', '{encpassword}') " )
+        user1 = User.query.filter_by(srfid = srfid).first()
+        #giving the login access from here
+        flash("Signup Success Please Login", "success")
+        return render_template("userlogin.html")
 
     return render_template("usersignup.html")
 
-
 @app.route('/login', methods=['POST', 'GET'])
-def login(request):
+def login():
     if request.method=="POST":
         srfid = request.form.get('srfid')
         dob = request.form.get('dob')
-        user = User.query.filter_by(srfid = srfid).first 
+        print("[LOGIN]: Logging in with- ", srfid, " ", dob)
+        user = User.query.filter_by(srfid = srfid).first()
         #filtering email address
 
         if user and check_password_hash(user.dob,dob):
-            login_user(user)
-            return 'Login success'
-        else:
-            return 'Login fail'
+            print("[LOGIN]: password validated")
 
-    return render_template("userlogin.html")
+            login_user(user)
+            flash(" Login success" , "info")
+            return render_template("index.html")
+        else:
+            print("[LOGIN]: password validatedn't")
+
+            flash("Invalid Credentials","danger") #danger is the colour
+            return render_template("userlogin.html") #redirect to this template
+    elif request.method =="GET":
+        print("[LOGIN]: serving login page")
+        return render_template("userlogin.html")
+        
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash("Logout Successful", "warning")
+    return redirect(url_for('login'))
 
     
 #checking whether database is connected or not

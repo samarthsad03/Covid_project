@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>Covid centre</title>
+  <title>{% block title %} {% endblock title %} </title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
@@ -64,13 +64,26 @@
           <li><a class="nav-link scrollto " href="/">Home</a></li>
           <li><a class="nav-link scrollto" href="#departments">Patient Details</a></li>
           <li><a class="nav-link scrollto" href="#doctors">Available Beds</a></li>
-          <li class="dropdown"><a href="#"><span>Sign in</span> <i class="bi bi-chevron-down"></i></a>
+
+{% if current_user.is_authenticated %}
+
+        <li class="dropdown"><a href="/login"><span>Welcome{{current_user.email}}</span> <i class="bi bi-chevron-down"></i></a>
+          <ul>
+            <li><a href="/logout">Logout</a></li>
+          </ul>
+        </li>
+{% else %}
+
+          <li class="dropdown"><a href="/login"><span>Sign in</span> <i class="bi bi-chevron-down"></i></a>
             <ul>
-              <li><a href="/userlogin">User Login</a></li>
-              <li><a href="hospitalogin">Hospital Login </a></li>
-              <li><a href="/admin">Admin Login</a></li>
+              <li><a href="/login">User Log in</a></li>
+              <li><a href="/hospitallogin">hospital Log in </a></li>
+              <li><a href="/admin">Admin Log in</a></li>
             </ul>
           </li>
+
+{% endif %}          
+
           <li><a class="nav-link scrollto" href="#contact">Contact</a></li>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
