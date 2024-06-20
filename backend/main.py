@@ -35,13 +35,13 @@ class Test(db.Model):
     name = db.column(db.String(50))
 
 
-class User(UserMixin, db.Model):
+class hospitalser(UserMixin, db.Model):
     hid = db.Column(db.Integer,primary_key=True)
     hcode = db.Column(db.String(20),unique_key=True)
     username = db.Column(db.String(100))
     password = db.Column(db.String(1000))
 
-class hospitaluser(UserMixin, db.Model):
+class User(UserMixin, db.Model):
     id = db.Column(db.Integer,primary_key=True)
     srfid = db.Column(db.String(20),unique_key=True)
     email = db.Column(db.String(50))
@@ -115,7 +115,7 @@ def admin():
         return render_template("admin.html")
     elif request.method =="GET":
         print("[LOGIN]: serving login page")
-        return render_template("userlogin.html")
+        return render_template("admin.html")
         
 @app.route('/logout')
 @login_required
@@ -130,6 +130,7 @@ def hospitaluser():
         if request.method=="POST":
             pass
         return render_template("addhospitaluser.html")
+    
 
     
 #checking whether database is connected or not
@@ -142,6 +143,16 @@ def test():
     except Exception as e:
         print(e)
         return f'not connected{e}'
+    
+@app.route('/logoutadmin')
+def logoutadmin():
+
+    session.pop('user')
+    flash("You have been logged out ", "primary")
+
+    return redirect('/admin')
+
+                    
     
     
 
